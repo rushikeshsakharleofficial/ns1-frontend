@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNS Manager - LinuxHardened</title>
+    <meta name="description" content="Professional DNS management dashboard for BIND named server">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Login Page -->
+    <div id="login-page" class="page active">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="logo-container">
+                        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                            <path d="M2 17l10 5 10-5" />
+                            <path d="M2 12l10 5 10-5" />
+                        </svg>
+                    </div>
+                    <h1>DNS Manager</h1>
+                    <p class="subtitle">Secure BIND Management Console</p>
+                </div>
+
+                <form id="login-form" class="login-form">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required autocomplete="username"
+                            placeholder="Enter your username">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required autocomplete="current-password"
+                            placeholder="Enter your password">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <span class="btn-text">Sign In</span>
+                        <span class="btn-loader"></span>
+                    </button>
+                </form>
+
+                <div id="login-error" class="error-message"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboard-page" class="page">
+        <div class="dashboard-layout">
+            <nav class="navbar">
+                <div class="navbar-brand">
+                    <svg class="logo-icon" style="color: var(--color-primary); width: 28px; height: 28px;"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                        <path d="M2 17l10 5 10-5" />
+                        <path d="M2 12l10 5 10-5" />
+                    </svg>
+                    <span class="brand-text">DNS Manager</span>
+                </div>
+
+                <div class="navbar-user">
+                    <div class="user-badge">
+                        <span id="user-name">Admin</span>
+                        <span id="user-role" class="user-role-badge">admin</span>
+                    </div>
+                    <button id="logout-btn" class="btn btn-ghost btn-sm">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        Logout
+                    </button>
+                </div>
+            </nav>
+
+            <div class="main-content">
+                <aside class="sidebar">
+                    <div class="sidebar-section">
+                        <h3 class="sidebar-title">Management</h3>
+                        <button class="sidebar-btn active" data-view="zones">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="2" y1="12" x2="22" y2="12" />
+                                <path
+                                    d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                            </svg>
+                            <span>DNS Zones</span>
+                        </button>
+                        <button class="sidebar-btn" data-view="logs">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            <span>Event Logs</span>
+                        </button>
+                    </div>
+
+                    <div id="admin-section" class="sidebar-section">
+                        <h3 class="sidebar-title">Administration</h3>
+
+                        <button id="users-nav-btn" class="sidebar-btn" data-view="users">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            <span>User Management</span>
+                        </button>
+
+                        <button id="restart-service-btn" class="sidebar-btn" style="color: var(--color-danger);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M23 4v6h-6" />
+                                <path d="M1 20v-6h6" />
+                                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                            </svg>
+                            <span>Restart Named</span>
+                        </button>
+                    </div>
+                </aside>
+
+                <div class="content-area">
+                    <!-- DNS Zones View -->
+                    <div id="zones-view" class="view active">
+                        <div class="view-header">
+                            <h2>DNS Zone Management</h2>
+                        </div>
+
+                        <div class="card">
+                            <div class="toolbar">
+                                <div class="search-container">
+                                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg>
+                                    <input type="text" id="zone-search-input" class="search-input"
+                                        placeholder="Search available zones...">
+                                </div>
+                                <div class="zone-selector-container">
+                                    <label for="zone-selector">Select Zone:</label>
+                                    <select id="zone-selector" class="select-input">
+                                        <option value="">Loading zones...</option>
+                                    </select>
+                                </div>
+                                <button id="create-zone-btn" class="btn btn-primary"
+                                    style="align-self: flex-end; margin-bottom: 2px;">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <line x1="12" y1="5" x2="12" y2="19" />
+                                        <line x1="5" y1="12" x2="19" y2="12" />
+                                    </svg>
+                                    New Zone
+                                </button>
+                            </div>
+
+                            <div id="zone-content" class="zone-content">
+                                <div class="empty-state">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <circle cx="12" cy="12" r="10" />
+                                        <line x1="12" y1="16" x2="12" y2="12" />
+                                        <line x1="12" y1="8" x2="12.01" y2="8" />
+                                    </svg>
+                                    <p>Select a zone above to manage DNS records</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DNS Records Table (will be shown when zone is selected) -->
+                        <div id="records-section" class="records-section" style="display: none;">
+                            <div class="section-header">
+                                <h3 id="zone-title">Zone Records</h3>
+                                <div class="section-actions">
+                                    <div class="search-container" style="width: 250px; margin-right: 1rem;">
+                                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                        </svg>
+                                        <input type="text" id="record-search-input" class="search-input"
+                                            placeholder="Search records...">
+                                    </div>
+                                    <button id="add-record-btn" class="btn btn-primary">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                            <line x1="12" y1="5" x2="12" y2="19" />
+                                            <line x1="5" y1="12" x2="19" y2="12" />
+                                        </svg>
+                                        Add Record
+                                    </button>
+                                    <button id="reload-zone-btn" class="btn btn-secondary">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                            <path d="M23 4v6h-6" />
+                                            <path d="M1 20v-6h6" />
+                                            <path
+                                                d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                                        </svg>
+                                        Reload Zone
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="soa-info">
+                                <div id="soa-info-content" style="display: contents;"></div>
+                            </div>
+
+                            <div class="toolbar"
+                                style="margin-top: 1rem; margin-bottom: 0.5rem; border: none; background: transparent; padding: 0;">
+                                <label class="toggle-label">
+                                    <input type="checkbox" id="show-comments-toggle" checked>
+                                    <span>Show Comments</span>
+                                </label>
+                            </div>
+
+                            <div class="table-container">
+                                <table id="records-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Name</th>
+                                            <th>Value</th>
+                                            <th class="comment-column">Comment</th>
+                                            <th style="text-align: right;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="records-tbody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Management View -->
+                    <div id="users-view" class="view">
+                        <div class="view-header">
+                            <h2>User Management</h2>
+                            <button id="add-user-btn" class="btn btn-primary">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <line x1="12" y1="5" x2="12" y2="19" />
+                                    <line x1="5" y1="12" x2="19" y2="12" />
+                                </svg>
+                                New User
+                            </button>
+                        </div>
+
+                        <div class="table-container">
+                            <table id="users-table">
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Role</th>
+                                        <th>Created At</th>
+                                        <th>Last Login</th>
+                                        <th style="text-align: right;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-tbody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Event Logs View -->
+                    <div id="logs-view" class="view">
+                        <div class="view-header">
+                            <h2>System Event Logs</h2>
+                            <div class="log-filters">
+                                <select id="action-filter" class="select-input">
+                                    <option value="">All Actions</option>
+                                    <option value="login">Login</option>
+                                    <option value="add_record">Add Record</option>
+                                    <option value="update_record">Update Record</option>
+                                    <option value="delete_record">Delete Record</option>
+                                    <option value="reload_zone">Reload Zone</option>
+                                    <option value="restart_service">Restart Service</option>
+                                </select>
+                                <button id="refresh-logs-btn" class="btn btn-secondary">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        style="width: 16px; height: 16px;">
+                                        <path d="M23 4v6h-6"></path>
+                                        <path d="M1 20v-6h6"></path>
+                                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15">
+                                        </path>
+                                    </svg>
+                                    Refresh
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="table-container">
+                            <table class="logs-table">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>User</th>
+                                        <th>Action</th>
+                                        <th>Status</th>
+                                        <th>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="logs-tbody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Record Modal -->
+    <div id="record-modal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Add DNS Record</h3>
+                <button id="close-modal-btn" class="btn-close">&times;</button>
+            </div>
+
+            <form id="record-form" class="record-form">
+                <div class="form-group">
+                    <label for="record-type">Record Type</label>
+                    <select id="record-type" name="type" class="select-input" required>
+                        <option value="A">A - IPv4 Address</option>
+                        <option value="AAAA">AAAA - IPv6 Address</option>
+                        <option value="MX">MX - Mail Exchange</option>
+                        <option value="CNAME">CNAME - Canonical Name</option>
+                        <option value="TXT">TXT - Text Record</option>
+                        <option value="SRV">SRV - Service Record</option>
+                        <option value="PTR">PTR - Pointer Record</option>
+                        <option value="NS">NS - Name Server</option>
+                    </select>
+                </div>
+
+                <div id="dynamic-fields"></div>
+
+                <div class="modal-actions">
+                    <button type="button" id="cancel-record-btn" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span id="submit-btn-text">Add Record</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- User Modal -->
+    <div id="user-modal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="user-modal-title">Create New User</h3>
+                <button id="close-user-modal-btn" class="btn-close">&times;</button>
+            </div>
+
+            <form id="user-form" class="record-form">
+                <div class="form-group">
+                    <label for="new-username">Username</label>
+                    <input type="text" id="new-username" name="username" pattern="[a-zA-Z0-9_]{3,20}"
+                        title="3-20 characters, alphanumeric and underscore only" required placeholder="e.g. jdoe">
+                </div>
+
+                <div class="form-group">
+                    <label for="new-password">Password</label>
+                    <input type="password" id="new-password" name="password" minlength="8" required
+                        placeholder="Min 8 characters">
+                </div>
+
+                <div class="form-group">
+                    <label for="new-role">Role</label>
+                    <select id="new-role" name="role" class="select-input">
+                        <option value="user">User (Standard Access)</option>
+                        <option value="admin">Admin (Full Access)</option>
+                    </select>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="cancel-user-btn" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Zone Modal -->
+    <div id="zone-modal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Zone</h3>
+                <button id="close-zone-modal-btn" class="btn-close">&times;</button>
+            </div>
+
+            <form id="zone-form" class="record-form">
+                <div class="form-group">
+                    <label for="new-zone-name">Zone Name</label>
+                    <input type="text" id="new-zone-name" name="name" required placeholder="e.g. example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="new-zone-type">Type</label>
+                    <select id="new-zone-type" name="type" class="select-input">
+                        <option value="forward">Forward (.hosts)</option>
+                        <option value="reverse">Reverse (.rev)</option>
+                    </select>
+                </div>
+
+                <details class="advanced-options"
+                    style="margin-bottom: 1rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 0.5rem; background: var(--color-bg-secondary);">
+                    <summary style="cursor: pointer; font-weight: 500; color: var(--color-primary); padding: 0.25rem;">
+                        Advanced Network Options</summary>
+                    <div style="padding-top: 0.5rem;">
+                        <div class="form-group">
+                            <label for="allow-transfer-ips" style="font-size: 0.9rem;">Allow Transfer IPs</label>
+                            <textarea id="allow-transfer-ips" name="allow_transfer_ips" class="text-input" rows="2"
+                                placeholder="104.237.137.10; ... (Leave empty for defaults)"
+                                style="resize: vertical; font-family: monospace; font-size: 0.85rem; min-height: 50px;"></textarea>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="also-notify-ips" style="font-size: 0.9rem;">Also Notify IPs</label>
+                            <textarea id="also-notify-ips" name="also_notify_ips" class="text-input" rows="2"
+                                placeholder="104.237.137.10; ... (Leave empty for defaults)"
+                                style="resize: vertical; font-family: monospace; font-size: 0.85rem; min-height: 50px;"></textarea>
+                        </div>
+                    </div>
+                </details>
+
+                <div class="modal-actions">
+                    <button type="button" id="cancel-zone-btn" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Zone</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script src="js/app.js" type="module"></script>
+</body>
+
+</html>

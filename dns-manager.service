@@ -1,0 +1,18 @@
+[Unit]
+Description=DNS Manager - Web Interface for BIND
+After=network.target docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/path/to/ns1/backend
+Environment="PATH=/path/to/ns1/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin"
+ExecStart=/path/to/ns1/venv/bin/python app.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
